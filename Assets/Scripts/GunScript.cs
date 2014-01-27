@@ -4,6 +4,7 @@ using System.Collections;
 public class GunScript : MonoBehaviour
 {
 	public GameObject BulletPrefab;
+	public int Ammunition;
 	public float RateOfFire;
 	public float BulletSpeed;
 
@@ -26,9 +27,12 @@ public class GunScript : MonoBehaviour
 	{
 		if (fireTimer <= 0f)
 		{
-			Shoot();
-
-			fireTimer = fireDelay;
+			if (Ammunition > 0)
+			{
+				Shoot();
+				Ammunition--;
+				fireTimer = fireDelay;
+			}
 		}
 	}
 

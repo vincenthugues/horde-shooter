@@ -5,9 +5,14 @@ public class EnemyScript : MonoBehaviour
 {
 	public int HitPoints;
 	public float Speed;
+	public float AttackRange;
+	public int AttackDamage;
 
 	public EnemySpawnerScript spawner { get; set; }
 	public GameObject target { get; set; }
+
+	private float attackTimer = 0f;
+	private Vector3 lastKnownTargetPosition;
 
 	void Start()
 	{
@@ -16,9 +21,38 @@ public class EnemyScript : MonoBehaviour
 	void Update()
 	{
 		if (HitPoints > 0)
-			transform.Translate((target.transform.position - transform.position).normalized * Time.deltaTime * Speed);
+		{
+			if (target != null)
+			{
+				lastKnownTargetPosition = target.transform.position;
+
+				transform.Translate((target.transform.position - transform.position).normalized * Time.deltaTime * Speed);
+
+				if (attackTimer > 0f)
+					attackTimer -= Time.deltaTime;
+
+				if (Vector3.Distance(transform.position, target.transform.position) <= AttackRange
+				    && target.tag == "Player"
+				    && attackTimer <= 0f)
+					Attack();
+			}
+			else if (lastKnownTargetPosition != null)
+				transform.Translate((lastKnownTargetPosition - transform.position).normalized * Time.deltaTime * Speed / 2);
+			// else => Random movement?
+		}
 		else
 			Destroy(gameObject);
+	}
+
+	private void Attack()
+	{
+		PlayerScript playerScript = target.GetComponent<PlayerScript>();
+
+		if (playerScript != null)
+		{
+			playerScript.GetHit(AttackDamage);
+			attackTimer = 1f;
+		}
 	}
 
 	public void GetHit(int damage)
@@ -27,6 +61,9 @@ public class EnemyScript : MonoBehaviour
 		{
 			HitPoints -= damage;
 		}
+		
+		if (HitPoints < 0)
+			HitPoints = 0;
 	}
 
 	private void OnDestroy()

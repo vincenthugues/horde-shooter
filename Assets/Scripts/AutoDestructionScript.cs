@@ -14,7 +14,8 @@ public class AutoDestructionScript : MonoBehaviour
 	
 	void Update()
 	{
-		if (Vector3.Distance(transform.position, player.transform.position) > MaximumDistance)
+		if (player != null
+		    && Vector3.Distance(transform.position, player.transform.position) > MaximumDistance)
 			Destroy(gameObject);
 	}
 }

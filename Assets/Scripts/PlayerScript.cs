@@ -3,6 +3,7 @@ using System.Collections;
 
 public class PlayerScript : MonoBehaviour
 {
+	public int HitPoints;
 	public float MovementSpeed;
 	public GameObject Gun;
 
@@ -20,20 +21,22 @@ public class PlayerScript : MonoBehaviour
 	
 	void Update()
 	{
-		Vector3 displacement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
-
-		if (displacement != Vector3.zero)
+		if (HitPoints > 0)
 		{
-			transform.position += MovementSpeed * Time.deltaTime * displacement;
+			Vector3 displacement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+
+			if (displacement != Vector3.zero)
+				transform.position += MovementSpeed * Time.deltaTime * displacement;
+
+			FaceTarget();
+
+			if (Input.GetMouseButton(0))
+				TriggerWeapon();
 
 			Camera.main.transform.position = new Vector3(transform.position.x, Camera.main.transform.position.y, transform.position.z);
 		}
-
-		if (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0 )
-			FaceTarget();
-
-		if (Input.GetMouseButton(0))
-			TriggerWeapon();
+		else
+			Destroy(gameObject);
 	}
 
 	private void FaceTarget()
@@ -51,9 +54,24 @@ public class PlayerScript : MonoBehaviour
 
 	private void TriggerWeapon()
 	{
-		Debug.DrawLine(transform.position, aimingTarget * 100f);
-		
 		if (gunScript != null)
 			gunScript.Trigger();
+	}
+
+	public void GetHit(int damage)
+	{
+		if (HitPoints > 0)
+		{
+			HitPoints -= damage;
+		}
+
+		if (HitPoints < 0)
+			HitPoints = 0;
+	}
+
+	private void OnDestroy()
+	{
+		if (Gun != null)
+			Gun.transform.parent = null;
 	}
 }
