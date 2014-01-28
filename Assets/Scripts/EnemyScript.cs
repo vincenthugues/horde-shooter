@@ -36,7 +36,7 @@ public class EnemyScript : MonoBehaviour
 				    && attackTimer <= 0f)
 					Attack();
 			}
-			else if (lastKnownTargetPosition != null)
+			else //if (lastKnownTargetPosition != null)
 				transform.Translate((lastKnownTargetPosition - transform.position).normalized * Time.deltaTime * Speed / 2);
 			// else => Random movement?
 		}

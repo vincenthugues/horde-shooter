@@ -23,7 +23,7 @@ public class PlayerScript : MonoBehaviour
 	{
 		if (HitPoints > 0)
 		{
-			Vector3 displacement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical"));
+			Vector3 displacement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
 
 			if (displacement != Vector3.zero)
 				transform.position += MovementSpeed * Time.deltaTime * displacement;
@@ -36,7 +36,12 @@ public class PlayerScript : MonoBehaviour
 			Camera.main.transform.position = new Vector3(transform.position.x, Camera.main.transform.position.y, transform.position.z);
 		}
 		else
+		{
+			if (Gun != null)
+				Gun.transform.parent = null;
+
 			Destroy(gameObject);
+		}
 	}
 
 	private void FaceTarget()
@@ -67,11 +72,5 @@ public class PlayerScript : MonoBehaviour
 
 		if (HitPoints < 0)
 			HitPoints = 0;
-	}
-
-	private void OnDestroy()
-	{
-		if (Gun != null)
-			Gun.transform.parent = null;
 	}
 }
