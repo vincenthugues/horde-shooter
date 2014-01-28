@@ -7,6 +7,7 @@ public class GunScript : MonoBehaviour
 	public int Ammunition;
 	public float RateOfFire;
 	public float BulletSpeed;
+	public float BulletSpawnDistance;
 
 	private float fireTimer;
 	private float fireDelay;
@@ -38,7 +39,7 @@ public class GunScript : MonoBehaviour
 
 	private void Shoot()
 	{
-		GameObject bullet = Instantiate(BulletPrefab, transform.position + transform.forward, Quaternion.identity) as GameObject;
+		GameObject bullet = Instantiate(BulletPrefab, transform.position + transform.forward * BulletSpawnDistance, Quaternion.identity) as GameObject;
 
 		BulletScript bulletScript = bullet.GetComponent<BulletScript>();
 		bulletScript.Movement = transform.forward * BulletSpeed;
