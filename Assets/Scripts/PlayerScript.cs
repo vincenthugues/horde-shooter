@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -7,9 +8,10 @@ public class PlayerScript : MonoBehaviour
 	public float WalkingSpeed;
 	public float SprintingSpeed;
 
-	private GameObject Gun;
+	private List<GameObject> weapons = new List<GameObject>();
+	private int currentWeapon = -1;
 	private Vector3 aimingTarget = Vector3.zero;
-	private GunScript gunScript;
+	private GunScript weaponScript;
 
 	void Start()
 	{
@@ -28,6 +30,10 @@ public class PlayerScript : MonoBehaviour
 
 			FaceTarget();
 
+			float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
+			if (mouseWheel != 0f)
+				CycleWeapons(mouseWheel > 0f ? 1 : -1);
+
 			if (Input.GetMouseButton(0))
 				TriggerWeapon();
 
@@ -35,8 +41,8 @@ public class PlayerScript : MonoBehaviour
 		}
 		else
 		{
-			if (Gun != null)
-				Gun.transform.parent = null;
+			foreach (GameObject weapon in weapons)
+				weapon.transform.parent = null;
 
 			Destroy(gameObject);
 		}
@@ -44,7 +50,7 @@ public class PlayerScript : MonoBehaviour
 
 	private void FaceTarget()
 	{
-		int layerMask = 1 << 10; // Ground's layer
+		int layerMask = 1 << 10; // Collision mask with the ground's layer id
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		
@@ -57,19 +63,41 @@ public class PlayerScript : MonoBehaviour
 
 	private void TriggerWeapon()
 	{
-		if (gunScript != null)
-			gunScript.Trigger();
+		if (weaponScript != null)
+			weaponScript.Trigger();
 	}
 
 	public void PickupWeapon(GameObject weapon)
 	{
 		if (weapon != null)
 		{
-			// Gun?
-			Gun = weapon;
-			Gun.transform.parent = transform;
-			gunScript = Gun.GetComponent<GunScript>();
+			// Add the weapon to the list
+			weapons.Add(weapon);
+			// Make it a child object of the player
+			weapon.transform.parent = transform;
+			// Switch to the new weapon
+			SwitchWeapons(weapons.Count - 1);
 		}
+	}
+
+	public void SwitchWeapons(int weaponIndex)
+	{
+		// If a weapon is equiped, disable it
+		if (currentWeapon != -1)
+			weapons[currentWeapon].SetActive(false);
+
+		currentWeapon = weaponIndex;
+		// Enable the new weapon
+		weapons[currentWeapon].SetActive(true);
+		weaponScript = weapons[currentWeapon].GetComponent<GunScript>();
+	}
+
+	public void CycleWeapons(int direction)
+	{
+		if (direction > 0)
+			SwitchWeapons((currentWeapon + 1) % weapons.Count);
+		else if (direction < 0)
+			SwitchWeapons(currentWeapon > 0 ? currentWeapon - 1 : weapons.Count - 1);
 	}
 
 	public void GetHit(int damage)
@@ -85,7 +113,7 @@ public class PlayerScript : MonoBehaviour
 
 	public void AddAmmunition(int quantity)
 	{
-		if (quantity > 0 && Gun != null && gunScript != null)
-			gunScript.Ammunition += quantity;
+		if (quantity > 0 && weaponScript != null)
+			weaponScript.Ammunition += quantity;
 	}
 }

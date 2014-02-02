@@ -47,7 +47,8 @@ public class GunScript : MonoBehaviour
 		{
 			if (Ammunition > 0)
 			{
-				Shoot();
+				for (int i = 0; i < BulletPrefab.GetComponent<BulletScript>().ProjectilesPerShot; i++)
+					Shoot();
 				Ammunition--;
 				fireTimer = fireDelay;
 			}
