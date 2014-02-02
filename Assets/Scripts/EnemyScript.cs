@@ -4,9 +4,10 @@ using System.Collections;
 public class EnemyScript : MonoBehaviour
 {
 	public int HitPoints;
-	public float Speed;
+	public float MovementSpeed;
 	public float AttackRange;
 	public int AttackDamage;
+	public GameObject AmmoPickupPrefab;
 
 	public EnemySpawnerScript spawner { get; set; }
 	public GameObject target { get; set; }
@@ -26,7 +27,11 @@ public class EnemyScript : MonoBehaviour
 			{
 				lastKnownTargetPosition = target.transform.position;
 
-				transform.Translate((target.transform.position - transform.position).normalized * Time.deltaTime * Speed);
+				Vector3 displacement = (target.transform.position - transform.position).normalized;
+				if (displacement != Vector3.zero)
+					transform.position += MovementSpeed * Time.deltaTime * displacement;
+
+				//transform.Translate((target.transform.position - transform.position).normalized * Time.deltaTime * Speed);
 
 				if (attackTimer > 0f)
 					attackTimer -= Time.deltaTime;
@@ -37,11 +42,16 @@ public class EnemyScript : MonoBehaviour
 					Attack();
 			}
 			else //if (lastKnownTargetPosition != null)
-				transform.Translate((lastKnownTargetPosition - transform.position).normalized * Time.deltaTime * Speed / 2);
+				transform.Translate((lastKnownTargetPosition - transform.position).normalized * Time.deltaTime * MovementSpeed / 2);
 			// else => Random movement?
 		}
 		else
+		{
+			if (Random.Range(0f, 1f) >= .75f)
+				Instantiate(AmmoPickupPrefab, transform.position, Quaternion.identity);
+			
 			Destroy(gameObject);
+		}
 	}
 
 	private void Attack()

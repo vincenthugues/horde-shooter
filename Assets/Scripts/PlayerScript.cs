@@ -4,19 +4,15 @@ using System.Collections;
 public class PlayerScript : MonoBehaviour
 {
 	public int HitPoints;
-	public float MovementSpeed;
-	public GameObject Gun;
+	public float WalkingSpeed;
+	public float SprintingSpeed;
 
+	private GameObject Gun;
 	private Vector3 aimingTarget = Vector3.zero;
 	private GunScript gunScript;
 
 	void Start()
 	{
-		if (Gun != null)
-		{
-			Gun.transform.parent = transform;
-			gunScript = Gun.GetComponent<GunScript>();
-		}
 	}
 	
 	void Update()
@@ -25,8 +21,10 @@ public class PlayerScript : MonoBehaviour
 		{
 			Vector3 displacement = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
 
+			float speed = Input.GetKey(KeyCode.LeftShift) ? SprintingSpeed : WalkingSpeed;
+
 			if (displacement != Vector3.zero)
-				transform.position += MovementSpeed * Time.deltaTime * displacement;
+				transform.position += displacement * Time.deltaTime * speed;
 
 			FaceTarget();
 
@@ -63,6 +61,17 @@ public class PlayerScript : MonoBehaviour
 			gunScript.Trigger();
 	}
 
+	public void PickupWeapon(GameObject weapon)
+	{
+		if (weapon != null)
+		{
+			// Gun?
+			Gun = weapon;
+			Gun.transform.parent = transform;
+			gunScript = Gun.GetComponent<GunScript>();
+		}
+	}
+
 	public void GetHit(int damage)
 	{
 		if (HitPoints > 0)
@@ -72,5 +81,11 @@ public class PlayerScript : MonoBehaviour
 
 		if (HitPoints < 0)
 			HitPoints = 0;
+	}
+
+	public void AddAmmunition(int quantity)
+	{
+		if (quantity > 0 && Gun != null && gunScript != null)
+			gunScript.Ammunition += quantity;
 	}
 }

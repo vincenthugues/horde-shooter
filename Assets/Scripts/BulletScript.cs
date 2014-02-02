@@ -9,7 +9,7 @@ public class BulletScript : MonoBehaviour
 	void Start()
 	{
 	}
-	
+
 	void Update()
 	{
 		transform.Translate(Movement * Time.deltaTime);
@@ -22,6 +22,8 @@ public class BulletScript : MonoBehaviour
 		if (enemyScript != null)
 			enemyScript.GetHit(Damage);
 
-		Destroy(gameObject);
+		if (collider.gameObject.tag != "Pickup item"
+		    && collider.gameObject.tag != "Bullet")
+			Destroy(gameObject);
 	}
 }

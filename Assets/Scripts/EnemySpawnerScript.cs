@@ -13,6 +13,7 @@ public class EnemySpawnerScript : MonoBehaviour
 	private int enemiesNb = 0;
 	private int aliveEnemies = 0;
 	private GameObject player;
+	//private GameObject enemiesParent;
 
 	void Start()
 	{
@@ -50,6 +51,8 @@ public class EnemySpawnerScript : MonoBehaviour
 	{
 		GameObject enemy = Instantiate(Enemies[0], transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity) as GameObject;
 		EnemyScript enemyScript = enemy.GetComponent<EnemyScript>();
+
+		enemy.transform.parent = transform;
 
 		enemyScript.spawner = this;
 		enemyScript.target = player;
