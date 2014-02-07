@@ -47,6 +47,11 @@ public class PlayerScript : MonoBehaviour
 			Destroy(gameObject);
 		}
 	}
+	
+	public void OnCollisionExit(Collision collision)
+	{
+		rigidbody.velocity = Vector3.zero;
+	}
 
 	private void FaceTarget()
 	{

@@ -26,17 +26,18 @@ public class EnemyScript : MonoBehaviour
 			if (target != null)
 			{
 				lastKnownTargetPosition = target.transform.position;
-
-				Vector3 displacement = (target.transform.position - transform.position).normalized;
-				if (displacement != Vector3.zero)
-					transform.position += MovementSpeed * Time.deltaTime * displacement;
-
-				//transform.Translate((target.transform.position - transform.position).normalized * Time.deltaTime * Speed);
+				float distance = Vector3.Distance(transform.position, target.transform.position);
 
 				if (attackTimer > 0f)
 					attackTimer -= Time.deltaTime;
-
-				if (Vector3.Distance(transform.position, target.transform.position) <= AttackRange
+				
+				if (distance > AttackRange)
+				{
+					Vector3 displacement = (target.transform.position - transform.position).normalized;
+					if (displacement != Vector3.zero)
+						transform.position += MovementSpeed * Time.deltaTime * displacement;
+				}
+				else if (Vector3.Distance(transform.position, target.transform.position) <= AttackRange
 				    && target.tag == "Player"
 				    && attackTimer <= 0f)
 					Attack();
@@ -52,6 +53,17 @@ public class EnemyScript : MonoBehaviour
 			
 			Destroy(gameObject);
 		}
+	}
+	
+	public void OnCollisionExit(Collision collision)
+	{
+		rigidbody.velocity = Vector3.zero;
+	}
+	
+	private void OnDestroy()
+	{
+		if (spawner != null)
+			spawner.EnemyDied();
 	}
 
 	private void Attack()
@@ -74,11 +86,5 @@ public class EnemyScript : MonoBehaviour
 		
 		if (HitPoints < 0)
 			HitPoints = 0;
-	}
-
-	private void OnDestroy()
-	{
-		if (spawner != null)
-			spawner.EnemyDied();
 	}
 }
