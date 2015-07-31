@@ -37,7 +37,7 @@ public class GunScript : MonoBehaviour
 			transform.rotation = collider.gameObject.transform.localRotation;
 			
 			inInventory = true;
-			gameObject.collider.enabled = false;
+			gameObject.GetComponent<Collider>().enabled = false;
 		}
 	}
 

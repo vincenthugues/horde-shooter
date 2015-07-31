@@ -57,7 +57,7 @@ public class EnemyScript : MonoBehaviour
 	
 	public void OnCollisionExit(Collision collision)
 	{
-		rigidbody.velocity = Vector3.zero;
+		GetComponent<Rigidbody>().velocity = Vector3.zero;
 	}
 	
 	private void OnDestroy()
